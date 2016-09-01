@@ -9,6 +9,8 @@ $('#userList table tbody').on('click', 'td a.linkshowuser', showUserInfo);
 $('#btnAddUser').on('click', addUser);
 // Delete User link click
 $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
+// Update User link click
+$('#userList table tbody').on('click', 'td a.linkupdateuser', updateUser);
 
 
 // Functions ========================================
@@ -45,6 +47,7 @@ var writeHTMLTable = (data) => {
             tableContent += '<tr>';
             tableContent += '<td><a href="#" class="linkshowuser" rel="' + this.username + '">' + this.username + '</a></td>';
             tableContent += '<td>' + this.email + '</td>';
+            tableContent += '<td><a href="#" class="linkupdateuser" rel="' + this._id + '">update</a></td>';
             tableContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></td>';
             tableContent += '</tr>';
         });
@@ -163,10 +166,67 @@ function deleteUser(event) {
 
     }
     else {
-
         // If they said no to the confirm, do nothing
         return false;
-
     }
 
+};
+
+// Update User
+function updateUser(event) {
+    event.preventDefault();
+		
+		//search through userListData using id to find the correct user
+		//userListData
+
+    // Super basic validation - increase errorCount variable if any fields are blank
+    var errorCount = 0;
+    $('#updateUser input').each(function(index, val) {
+        if($(this).val() === '') { errorCount++; }
+    });
+
+    // Check and make sure errorCount's still at zero
+    if(errorCount === 0) {
+
+        // If it is, compile all user info into one object
+        var updatingUser = {
+            'username': $('#updateUser fieldset input#inputUserName').val(),
+            'email': $('#updateUser fieldset input#inputUserEmail').val(),
+            'fullname': $('#updateUser fieldset input#inputUserFullname').val(),
+            'age': $('#updateUser fieldset input#inputUserAge').val(),
+            'location': $('#updateUser fieldset input#inputUserLocation').val(),
+            'gender': $('#updateUser fieldset input#inputUserGender').val()
+        }
+
+        // Use AJAX to update the object to our updateuser service
+        $.ajax({
+            type: 'PUT',
+            data: updatingUser,
+            url: '/users/updateuser/' + $(this).attr('rel'),
+            dataType: 'JSON'
+        }).done(function( response ) {
+
+            // Check for successful (blank) response
+            if (response.msg === '') {
+
+                // Clear the form inputs
+                $('#updateUser fieldset input').val('');
+
+                // Update the table
+                populateTable2();
+
+            }
+            else {
+
+                // If something goes wrong, alert the error message that our service returned
+                alert('Error: ' + response.msg);
+
+            }
+        });
+    }
+    else {
+        // If errorCount is more than 0, error out
+        alert('Please fill in all fields');
+        return false;
+    }
 };
