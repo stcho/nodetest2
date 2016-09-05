@@ -7,7 +7,7 @@ Simple RESTful web application with Node.js, Express, and MongoDB. User create, 
 ####Setup Instructions
 ```
 git clone git@github.com:stcho/nodetest2.git'
-cd reactblog
+cd nodetest2
 mkdir data
 npm install
 cd MongoDB's bin (~/mongo/bin)
